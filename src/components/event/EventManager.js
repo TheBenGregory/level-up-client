@@ -17,3 +17,35 @@ export const getEvents = () => {
      })
         
   }
+
+  export const getEventGames = () => {
+    return fetch("http://localhost:8000/games", {
+        headers:{
+            "Authorization": `Token ${localStorage.getItem("lu_token")}`
+        }
+    })
+        .then(response => response.json())
+}
+
+export const leaveEvent = eventId => {
+    return fetch(`http://localhost:8000/events/${ eventId }/signup`, {
+        method: "DELETE",
+        headers:{
+            "Authorization": `Token ${localStorage.getItem("lu_token")}`
+        }
+    })
+        .then(getEvents)
+}
+
+export const joinEvent = eventId => {
+    return fetch(`http://localhost:8000/events/${ eventId }/signup`, {
+        method: "POST",
+        headers:{
+            "Authorization": `Token ${localStorage.getItem("lu_token")}`
+        }
+    })
+        .then(response => response.json())
+        .then(getEvents)
+}
+
+

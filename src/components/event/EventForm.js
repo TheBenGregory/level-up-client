@@ -1,13 +1,19 @@
-import { createEvent, getEvents } from "./EventManager.js"
+import { createEvent, getEvents, getEventGames } from "./EventManager.js"
+
 import React, { useState, useEffect } from "react"
 import { useHistory } from "react-router-dom"
 
 export const EventForm = () => {
     const [event, setEvent] = useState({})
+    const [games, setGames] = useState([])
     const history = useHistory()
 
     useEffect(() => {
         getEvents().then(d => setEvent(d))
+      }, [])
+
+      useEffect(() => {
+        getEventGames().then(d => setGames(d))
       }, [])
 
 
@@ -17,21 +23,30 @@ export const EventForm = () => {
         setState(copyEvent)
     }
 
+
     const saveEvent = (event) => {
         event.preventDefault()
 
         createEvent(event).then(() => {
-            history.push('/')
+            history.push('/events')
         })
     }
 
     return (
         <div>
-            <label>Description:</label>
-            <input type="text" name="description" onchange={(evt) => handleOnChange(evt)}></input>
-            <label>Organizer:</label>
+            <label>Game:</label>
+            <select name="game" className="form-control"
+                        value={ event.game }
+                        onChange={ handleOnChange }>
+                        <option value="0">Select a game...</option>
+                        {
+                            games.map(game => (
+                                <option value={game.id}>{game.title}</option>
+                            ))
+                        }
+                    </select>
+            <label>Event Description:</label>
             <input type="text" name="organizer" onchange={(evt) => handleOnChange(evt)}></input>
-            
             <label>Date:</label>
             <input type="date" name="date" onchange={(evt) => handleOnChange(evt)}></input>
             <label>Time:</label>
