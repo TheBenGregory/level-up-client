@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useHistory } from "react-router-dom"
 import { getEvents, joinEvent, leaveEvent } from "./EventManager.js"
+import { Link } from "react-router-dom"
 
 
 export const EventList = () => {
@@ -28,8 +29,8 @@ export const EventList = () => {
             {
                 events.map(event => {
                     return <section key={event.id} className="registration">
-                        <div className="registration__game">{event.game.title}</div>
-                        <div>{event.description}</div>
+                        <div className="registration__game"><b>Game:</b> <i>{event.game.title}</i></div>
+                        <div>Event Description: <i>{event.description}</i></div>
                         <div>
                             {event.date} @ {event.time}
                         </div>
@@ -42,6 +43,7 @@ export const EventList = () => {
                                     onClick={() => joinEvent(event.id).then(() => eventFetcher())}
                                     >Join</button>
                         }
+                        <Link className="event-add" to="/event/new"><button>Edit</button></Link>
                     </section>
                 })
             }

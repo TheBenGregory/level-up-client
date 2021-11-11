@@ -1,43 +1,52 @@
-import { createEvent, getEvents, getEventGames } from "./EventManager.js"
-
 import React, { useState, useEffect } from "react"
 import { useHistory } from "react-router-dom"
+import {getGames} from '../game/GameManager'
+import { createEvent, getEventGames, getEvent, updateEventsFetch } from "./EventManager"
+
 
 export const EventForm = () => {
-    const [event, setEvent] = useState({})
-    const [games, setGames] = useState([])
     const history = useHistory()
+    const [currentEvent, setEvent] = useState({})
+    const [ games, setGames ] = useState([])
 
     useEffect(() => {
-        getEvents().then(d => setEvent(d))
-      }, [])
+        // TODO: Get all existing games from API
+        getEventGames().then(gamesData => setEventGames(gamesData))
+    }, [])
 
-      useEffect(() => {
-        getEventGames().then(d => setGames(d))
-      }, [])
+    useEffect(() => {
+        if (eventId) {
+            getEvent(eventId).then((gameData) => setState({
+                ...gameData,
 
+            }))
+        }
+    }) [eventId]
 
-    const handleOnChange = (evt) => {
-        const copyEvent = { ...evt }
-        copyEvent[event.target.name] = event.target.value
-        setState(copyEvent)
+    const changeEventState = (domEvent) => {
+        // TODO: Complete the onChange function
+        const copyEvent = {...currentEvent}
+        copyEvent[domEvent.target.name] = domEvent.target.value
+        setEvent(copyEvent)
     }
 
+    const updateEvent = (domEvent) => {
+        domEvent.preventDefault()
 
-    const saveEvent = (event) => {
-        event.preventDefault()
-
-        createEvent(event).then(() => {
+        updateEventsFetch(currentEvent).then(() => {
             history.push('/events')
         })
     }
-
+    
     return (
-        <div>
-            <label>Game:</label>
-            <select name="game" className="form-control"
-                        value={ event.game }
-                        onChange={ handleOnChange }>
+        <form className="gameForm">
+            <h2 className="gameForm__title">Schedule New Event</h2>
+            <fieldset>
+                <div className="form-group">
+                    <label htmlFor="gameId">Game: </label>
+                    <select name="gameId" className="form-control"
+                        value={ currentEvent.gameId }
+                        onChange={ changeEventState }>
                         <option value="0">Select a game...</option>
                         {
                             games.map(game => (
@@ -45,14 +54,48 @@ export const EventForm = () => {
                             ))
                         }
                     </select>
-            <label>Event Description:</label>
-            <input type="text" name="organizer" onchange={(evt) => handleOnChange(evt)}></input>
-            <label>Date:</label>
-            <input type="date" name="date" onchange={(evt) => handleOnChange(evt)}></input>
-            <label>Time:</label>
-            <input type="time" name="time" onchange={(evt) => handleOnChange(evt)}></input>
-            <button onClick={(evt) => saveEvent(evt)}>Add New Event</button>
-        </div>
-    )
+                </div>
+            </fieldset>
+            <fieldset>
+                <div className="form-group">
+                    <label htmlFor="description">Description: </label>
+                    <input value={currentEvent.description} type="text" onChange={changeEventState} name="description"></input>
+                </div>
+            </fieldset>
+            <fieldset>
+                <div className="form-group">
+                    <label htmlFor="time">Time: </label>
+                    <input value={currentEvent.time} type="time" onChange={changeEventState} name="time"></input>
+                </div>
+            </fieldset>
+            <fieldset>
+                <div className="form-group">
+                    <label htmlFor="date">Date: </label>
+                    <input value={currentEvent.date} type="date" onChange={changeEventState} name="date"></input>
+                </div>
+            </fieldset>
 
+            {/* TODO: Create the rest of the input fields */}
+
+            <button type="submit"
+                onClick={evt => {
+                    evt.preventDefault()
+
+                    // TODO: Call the createEvent function and pass it the event object
+                    // TODO: Once event is created, redirect user to event list
+                    createEvent(currentEvent).then(() => history.push('/events'))
+
+                }}
+                className="btn btn-primary">Create Event</button>
+                <div>
+        <button onClick={(event) => {
+          if (gameId) {
+            updateGame(event)
+          } else {
+            saveGame(event)
+          }
+        }}>Save Game</button>
+      </div>
+        </form>
+    )
 }
